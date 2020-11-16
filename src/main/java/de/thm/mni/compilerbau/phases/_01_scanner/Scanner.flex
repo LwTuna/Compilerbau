@@ -32,4 +32,10 @@ import java_cup.runtime.*;
 
 // TODO (assignment 1): The regular expressions for all tokens need to be defined here.
 
+
+[ \t\n] { /* f¨ur SPACE, TAB und NEWLINE ist nichts zu tun */ }
+
+
+
 [^]		{ throw SplError.IllegalCharacter(new Position(yyline + 1, yycolumn + 1), yytext().charAt(0)); }
+
