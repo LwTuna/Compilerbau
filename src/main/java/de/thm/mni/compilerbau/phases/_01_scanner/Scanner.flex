@@ -51,12 +51,12 @@ var      { return symbol(Sym.VAR); }
 
 [:]      { return symbol(Sym.COLON); }
 [;]      { return symbol(Sym.SEMIC); }
-
+[,]      { return symbol(Sym.COMMA); }
 
 // Operator
-[<] {return symbol(Sym.LT);}
-[!=] {return symbol(Sym.NE);}
 [:=] {return symbol(Sym.ASGN);}
+[<] {return symbol(Sym.LT);}
+[#] {return symbol(Sym.NE);}
 [+] {return symbol(Sym.PLUS);}
 [/] {return symbol(Sym.SLASH);}
 [*] {return symbol(Sym.STAR);}
@@ -68,4 +68,10 @@ var      { return symbol(Sym.VAR); }
 
 [ \t\n\r] { /* f¨ur SPACE, TAB und NEWLINE ist nichts zu tun */ }
 
+[A-Za-z_] {return symbol(Sym.IDENT);}
+[\\] {return symbol(Sym.IDENT);}
+[.] {return symbol(Sym.IDENT);}
+[0-9] {return symbol(Sym.INTLIT);}
+
+['] {return symbol(Sym.IDENT);}
 [^]      { throw SplError.IllegalCharacter(new Position(yyline + 1, yycolumn + 1), yytext().charAt(0)); }

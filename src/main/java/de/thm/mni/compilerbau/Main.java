@@ -71,7 +71,7 @@ class Main {
         boolean optionTables = false;
         boolean optionSemant = false;
         boolean optionVars = false;
-        String inFilename = "C:\\Users\\Jonas\\Desktop\\Uni\\WS2020\\CP\\tests\\runtime_tests/test1.spl";
+        String inFilename = "spltest/test5.spl";
         String outFilename = "";
 
         for (String name : args) {
