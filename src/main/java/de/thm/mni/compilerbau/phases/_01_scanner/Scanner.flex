@@ -66,4 +66,6 @@ var      { return symbol(Sym.VAR); }
 [>=] {return symbol(Sym.GE);}
 [=] {return symbol(Sym.EQ);}
 
+[ \t\n\r] { /* f¨ur SPACE, TAB und NEWLINE ist nichts zu tun */ }
+
 [^]      { throw SplError.IllegalCharacter(new Position(yyline + 1, yycolumn + 1), yytext().charAt(0)); }
