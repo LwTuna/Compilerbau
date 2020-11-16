@@ -32,10 +32,25 @@ import java_cup.runtime.*;
 
 // TODO (assignment 1): The regular expressions for all tokens need to be defined here.
 
+else     { return symbol(Sym.ELSE); }
+while    { return symbol(Sym.WHILE); }
+ref      { return symbol(Sym.REF); }
+if       { return symbol(Sym.IF); }
+of       { return symbol(Sym.OF); }
+type     { return symbol(Sym.TYPE); }
+proc     { return symbol(Sym.PROC); }
+array    { return symbol(Sym.ARRAY); }
+var      { return symbol(Sym.VAR); }
 
-[ \t\n] { /* f¨ur SPACE, TAB und NEWLINE ist nichts zu tun */ }
+[(]      { return symbol(Sym.LPAREN); }
+[)]      { return symbol(Sym.RPAREN); }
+[\[]     { return symbol(Sym.LBRACK); }
+[\]]     { return symbol(Sym.RBRACK); }
+[{]      { return symbol(Sym.LCURL); }
+[}]      { return symbol(Sym.RCURL); }
+
+[:]      { return symbol(Sym.COLON); }
+[;]      { return symbol(Sym.SEMIC); }
 
 
-
-[^]		{ throw SplError.IllegalCharacter(new Position(yyline + 1, yycolumn + 1), yytext().charAt(0)); }
-
+[^]      { throw SplError.IllegalCharacter(new Position(yyline + 1, yycolumn + 1), yytext().charAt(0)); }
