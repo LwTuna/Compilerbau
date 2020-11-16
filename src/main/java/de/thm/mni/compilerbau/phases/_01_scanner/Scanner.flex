@@ -53,4 +53,17 @@ var      { return symbol(Sym.VAR); }
 [;]      { return symbol(Sym.SEMIC); }
 
 
+// Operator
+[<] {return symbol(Sym.LT);}
+[!=] {return symbol(Sym.NE);}
+[:=] {return symbol(Sym.ASGN);}
+[+] {return symbol(Sym.PLUS);}
+[/] {return symbol(Sym.SLASH);}
+[*] {return symbol(Sym.STAR);}
+[>] {return symbol(Sym.GT);}
+[<=] {return symbol(Sym.LE);}
+[-] {return symbol(Sym.MINUS);}
+[>=] {return symbol(Sym.GE);}
+[=] {return symbol(Sym.EQ);}
+
 [^]      { throw SplError.IllegalCharacter(new Position(yyline + 1, yycolumn + 1), yytext().charAt(0)); }
