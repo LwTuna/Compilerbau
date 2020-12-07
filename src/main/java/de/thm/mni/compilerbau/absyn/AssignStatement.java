@@ -22,6 +22,7 @@ public class AssignStatement extends Statement {
         super(position);
         this.target = target;
         this.value = value;
+
     }
 
     @Override

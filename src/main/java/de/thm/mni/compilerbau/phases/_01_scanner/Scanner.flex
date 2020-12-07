@@ -49,29 +49,42 @@ var      { return symbol(Sym.VAR); }
 [{]      { return symbol(Sym.LCURL); }
 [}]      { return symbol(Sym.RCURL); }
 
-[:]      { return symbol(Sym.COLON); }
+
 [;]      { return symbol(Sym.SEMIC); }
 [,]      { return symbol(Sym.COMMA); }
-
+[/][/]([ A-Za-z_.]|[0-9])* {}
 // Operator
-[:=] {return symbol(Sym.ASGN);}
-[<] {return symbol(Sym.LT);}
+
+:= {return symbol(Sym.ASGN);}
+[:]  { return symbol(Sym.COLON); }
+
 [#] {return symbol(Sym.NE);}
 [+] {return symbol(Sym.PLUS);}
 [/] {return symbol(Sym.SLASH);}
 [*] {return symbol(Sym.STAR);}
+[>][=] {return symbol(Sym.GE);}
+[<][=] {return symbol(Sym.LE);}
 [>] {return symbol(Sym.GT);}
-[<=] {return symbol(Sym.LE);}
-[-] {return symbol(Sym.MINUS);}
-[>=] {return symbol(Sym.GE);}
+[<] {return symbol(Sym.LT);}
 [=] {return symbol(Sym.EQ);}
+[-] {return symbol(Sym.MINUS);}
+
+
+
+0x[0-9A-Fa-f]+ {return symbol(Sym.INTLIT,Integer.parseInt(yytext().substring(2),16));}
 
 [ \t\n\r] { /* f¨ur SPACE, TAB und NEWLINE ist nichts zu tun */ }
+[A-Za-z_]([A-Za-z_]|[0-9])* {return symbol(Sym.IDENT,new Identifier(yytext()));}
+[0-9]+ {return symbol(Sym.INTLIT,Integer.parseInt(yytext()));}
 
-[A-Za-z_] {return symbol(Sym.IDENT);}
+['][\\][n]['] {return symbol(Sym.INTLIT,0x0a);}
+
 [\\] {return symbol(Sym.IDENT);}
-[.] {return symbol(Sym.IDENT);}
-[0-9] {return symbol(Sym.INTLIT);}
 
-['] {return symbol(Sym.IDENT);}
+
+
+[']([A-Za-z_])['] {return symbol(Sym.INTLIT,(int)yytext().charAt(1));}
+
+
 [^]      { throw SplError.IllegalCharacter(new Position(yyline + 1, yycolumn + 1), yytext().charAt(0)); }
+[.] {throw SplError.IllegalCharacter(new Position(yyline + 1, yycolumn + 1), yytext().charAt(0)); }
