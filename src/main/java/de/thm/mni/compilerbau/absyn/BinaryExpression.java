@@ -33,7 +33,7 @@ public class BinaryExpression extends Expression {
          * @return true if the operator is an arithmetic operator.
          */
         public boolean isArithmetic() {
-            throw new NotImplemented();     //TODO: Implement yourself if you need this
+            return List.of(ADD,SUB,MUL,DIV).contains(this);    //TODO: Implement yourself if you need this
         }
 
         /**
@@ -42,7 +42,7 @@ public class BinaryExpression extends Expression {
          * @return true if the operator is a comparison operator.
          */
         public boolean isComparison() {
-            throw new NotImplemented();     //TODO: Implement yourself if you need this
+            return !isArithmetic();
         }
 
         /**
@@ -51,7 +51,7 @@ public class BinaryExpression extends Expression {
          * @return The "opposite" comparison operator
          */
         public Operator flipComparison() {
-            throw new NotImplemented();     //TODO: Implement yourself if you need this
+            throw new NotImplemented();
         }
     }
 

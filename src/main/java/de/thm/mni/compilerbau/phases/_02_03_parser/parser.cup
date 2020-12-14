@@ -32,32 +32,31 @@ non terminal divmulti;
 non terminal unaryMinus;
 non terminal primaryExpression;
 non terminal variableExpression;
-non terminal procedure;
+non terminal ProcedureDeclaration procedure;
 non terminal parameterlist;
 non terminal parameter;
 non terminal declarationList;
 non terminal declaration;
 non terminal statement;
 non terminal statementList;
-non terminal ifstatement;
-non terminal whileStatement;
-non terminal compundStatement;
-non terminal callStatement;
+non terminal IfStatement ifstatement;
+non terminal WhileStatement whileStatement;
+non terminal CompoundStatement compundStatement;
+non terminal CallStatement callStatement;
+non terminal EmptyStatement emptyStatment;
 non terminal argList;
 non terminal expression;
 non terminal typeDeclaration;
-non terminal arrayDeclaration;
-non terminal typeList;
-non terminal procList;
+non terminal ArrayTypeExpression arrayDeclaration;
+non terminal globalDeclarations;
 
 
 start with program;
 
 
-program ::= typeList procList;
+program ::= globalDeclarations;
 
-typeList ::= typeDeclaration typeList | ;
-procList ::= procedure | procedure procList;
+globalDeclarations ::= typeDeclaration globalDeclarations | procedure globalDeclarations | ;
 
 procedure ::= PROC IDENT LPAREN parameterlist RPAREN LCURL declarationList statementList RCURL;
 
@@ -67,11 +66,11 @@ declaration ::= VAR IDENT COLON IDENT SEMIC ;
 typeDeclaration ::= TYPE IDENT EQ arrayDeclaration IDENT SEMIC;
 arrayDeclaration ::= ARRAY LBRACK expression RBRACK OF arrayDeclaration | ;
 
-statementList ::= statement statementList | ;
+statementList ::= statement statementList | emptyStatment;
+emptyStatment ::= ;
 
 
-
-ifstatement ::= IF LPAREN expression RPAREN statement ELSE statement | IF LPAREN expression RPAREN statement;
+ifstatement ::= IF:pos LPAREN expression:exp RPAREN statement:thenStm | IF LPAREN expression RPAREN statement ELSE statement ;
 
 statement ::= SEMIC | assignStatement | ifstatement | whileStatement | compundStatement | callStatement;
 whileStatement ::= WHILE LPAREN expression RPAREN statement;
