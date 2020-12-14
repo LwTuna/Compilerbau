@@ -27,18 +27,18 @@ terminal Integer INTLIT;      //Integer literals
 
 non terminal Program program;
 non terminal AssignStatement assignStatement;
-non terminal plusminus;
-non terminal divmulti;
-non terminal unaryMinus;
-non terminal primaryExpression;
-non terminal variableExpression;
+non terminal Expression plusminus;
+non terminal Expression divmulti;
+non terminal Expression unaryMinus;
+non terminal Expression primaryExpression;
+non terminal Expression variableExpression;
 non terminal ProcedureDeclaration procedure;
-non terminal parameterlist;
+non terminal List<ParameterDeclaration> parameterlist;
 non terminal parameter;
-non terminal declarationList;
+non terminal List<VariableDeclaration> declarationList;
 non terminal declaration;
 non terminal statement;
-non terminal statementList;
+non terminal List<Statement> statementList;
 non terminal IfStatement ifstatement;
 non terminal WhileStatement whileStatement;
 non terminal CompoundStatement compundStatement;
@@ -48,23 +48,29 @@ non terminal argList;
 non terminal expression;
 non terminal typeDeclaration;
 non terminal ArrayTypeExpression arrayDeclaration;
-non terminal globalDeclarations;
+non terminal List<GlobalDeclaration> globalDeclarations;
+non terminal TypeExpression typeExpression;
 
 
 start with program;
 
 
-program ::= globalDeclarations;
+program ::= globalDeclarations:decList {:RESULT = new Program(new Position(decListleft,decListright),decList);:};
 
-globalDeclarations ::= typeDeclaration globalDeclarations | procedure globalDeclarations | ;
 
-procedure ::= PROC IDENT LPAREN parameterlist RPAREN LCURL declarationList statementList RCURL;
+globalDeclarations ::= typeDeclaration:decl0 globalDeclarations:declList {:RESULT = List.cons(decl0,declList);:}
+        |procedure:decl0 globalDeclarations:declList{:RESULT = List.cons(decl0,declList);:}
+        | {:RESULT= List.nil();:};
+
+procedure ::= PROC:proc IDENT:name LPAREN parameterlist:parameters RPAREN LCURL declarationList:varList statementList:statList RCURL
+                {:RESULT= new ProcedureDeclaration(new Position());:};
+
+typeExpression ::= IDENT | ARRAY LBRACK INTLIT RBRACK OF typeExpression;
 
 declarationList ::= declaration declarationList | ;
-declaration ::= VAR IDENT COLON IDENT SEMIC ;
+declaration ::=  VAR IDENT COLON typeExpression SEMIC;
 
-typeDeclaration ::= TYPE IDENT EQ arrayDeclaration IDENT SEMIC;
-arrayDeclaration ::= ARRAY LBRACK expression RBRACK OF arrayDeclaration | ;
+typeDeclaration ::= TYPE IDENT EQ typeExpression SEMIC;
 
 statementList ::= statement statementList | emptyStatment;
 emptyStatment ::= ;
@@ -83,12 +89,14 @@ expression ::= plusminus LT plusminus | plusminus LE plusminus | plusminus GT pl
 
 argList ::= plusminus | plusminus COMMA argList | ;
 
-parameterlist ::= parameter | parameter COMMA parameter | ;
-parameter ::= IDENT COLON IDENT | REF IDENT COLON IDENT;
+parameterlist ::= parameter COMMA parameterlist | parameter | ;
+parameter ::= IDENT COLON typeExpression | REF IDENT COLON typeExpression;
 
 assignStatement ::= variableExpression ASGN plusminus SEMIC;
 
-plusminus ::= plusminus PLUS divmulti | plusminus MINUS divmulti | divmulti;
+plusminus ::= plusminus:exp0 PLUS divmulti:exp1 {: RESULT= new BinaryExpression(new Position(exp0left,exp1right),Operator.ADD,exp0,exp1);:}
+                | plusminus MINUS divmulti  {: RESULT= new BinaryExpression(new Position(exp0left,exp1right),Operator.SUB,exp0,exp1);:}
+                | divmulti:exp {:RESULT= exp;:};
 divmulti ::= divmulti STAR unaryMinus | divmulti SLASH unaryMinus | unaryMinus;
 unaryMinus ::= MINUS  primaryExpression | primaryExpression;
 primaryExpression ::= INTLIT | LPAREN plusminus RPAREN | variableExpression ;

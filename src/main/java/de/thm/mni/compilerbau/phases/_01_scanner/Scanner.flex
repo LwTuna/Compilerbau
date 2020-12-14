@@ -52,7 +52,7 @@ var      { return symbol(Sym.VAR); }
 
 [;]      { return symbol(Sym.SEMIC); }
 [,]      { return symbol(Sym.COMMA); }
-[/][/]([ A-Za-z_.]|[0-9])* {}
+[/][/]([ A-Za-z_]|[0-9]|.|,|:)* {}
 // Operator
 
 := {return symbol(Sym.ASGN);}
@@ -83,7 +83,7 @@ var      { return symbol(Sym.VAR); }
 
 
 
-[']([A-Za-z_])['] {return symbol(Sym.INTLIT,(int)yytext().charAt(1));}
+['](.)['] {return symbol(Sym.INTLIT,(int)yytext().charAt(1));}
 
 
 [^]      { throw SplError.IllegalCharacter(new Position(yyline + 1, yycolumn + 1), yytext().charAt(0)); }
