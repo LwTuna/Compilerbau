@@ -4,7 +4,8 @@ import java_cup.runtime.*;
 import de.thm.mni.compilerbau.utils.*;
 import de.thm.mni.compilerbau.absyn.*;
 import de.thm.mni.compilerbau.table.Identifier;
-import de.thm.mni.compilerbau.utils.SplError;
+import de.thm.mni.compilerbau.utils.*;
+
 
 parser code {:
   public void syntax_error(Symbol currentToken) {
@@ -31,25 +32,28 @@ non terminal Expression plusminus;
 non terminal Expression divmulti;
 non terminal Expression unaryMinus;
 non terminal Expression primaryExpression;
-non terminal Expression variableExpression;
+non terminal Variable variable;
+non terminal VariableExpression variableExpression;
 non terminal ProcedureDeclaration procedure;
 non terminal List<ParameterDeclaration> parameterlist;
-non terminal parameter;
+non terminal ParameterDeclaration parameter;
 non terminal List<VariableDeclaration> declarationList;
-non terminal declaration;
-non terminal statement;
+non terminal VariableDeclaration declaration;
+non terminal Statement statement;
 non terminal List<Statement> statementList;
 non terminal IfStatement ifstatement;
 non terminal WhileStatement whileStatement;
 non terminal CompoundStatement compundStatement;
 non terminal CallStatement callStatement;
-non terminal EmptyStatement emptyStatment;
-non terminal argList;
-non terminal expression;
-non terminal typeDeclaration;
-non terminal ArrayTypeExpression arrayDeclaration;
+non terminal EmptyStatement emptyStatement;
+non terminal List<Expression> argList;
+non terminal Expression expression;
+non terminal TypeDeclaration typeDeclaration;
 non terminal List<GlobalDeclaration> globalDeclarations;
 non terminal TypeExpression typeExpression;
+non terminal Expression binaryExpression;
+non terminal NamedVariable namedVariable;
+non terminal ArrayAccess arrayAccess;
 
 
 start with program;
@@ -63,41 +67,83 @@ globalDeclarations ::= typeDeclaration:decl0 globalDeclarations:declList {:RESUL
         | {:RESULT= List.nil();:};
 
 procedure ::= PROC:proc IDENT:name LPAREN parameterlist:parameters RPAREN LCURL declarationList:varList statementList:statList RCURL
-                {:RESULT= new ProcedureDeclaration(new Position());:};
+                {:RESULT= new ProcedureDeclaration(new Position(procleft,procright),name,parameters,varList,statList);:};
 
-typeExpression ::= IDENT | ARRAY LBRACK INTLIT RBRACK OF typeExpression;
+parameterlist ::= parameter:para {:RESULT = List.of(para);:}
+        |parameter:para COMMA parameterlist:paraList {:RESULT = List.cons(para,paraList);:}
+        | {:RESULT = List.nil();:};
 
-declarationList ::= declaration declarationList | ;
-declaration ::=  VAR IDENT COLON typeExpression SEMIC;
-
-typeDeclaration ::= TYPE IDENT EQ typeExpression SEMIC;
-
-statementList ::= statement statementList | emptyStatment;
-emptyStatment ::= ;
+parameter ::= IDENT:name COLON typeExpression:type {:RESULT = new ParameterDeclaration(new Position(nameleft,nameright),name,type,false);:}
+            | REF:ref IDENT:name COLON typeExpression:type {:RESULT = new ParameterDeclaration(new Position(refleft,refright),name,type,true);:};
 
 
-ifstatement ::= IF:pos LPAREN expression:exp RPAREN statement:thenStm | IF LPAREN expression RPAREN statement ELSE statement ;
+typeExpression ::= IDENT:name {:RESULT = new NamedTypeExpression(new Position(nameleft,nameright),name);:}
+                | ARRAY:arr LBRACK INTLIT:size RBRACK OF typeExpression:type {:RESULT = new ArrayTypeExpression(new Position(arrleft,arrright),type,size);:};
 
-statement ::= SEMIC | assignStatement | ifstatement | whileStatement | compundStatement | callStatement;
-whileStatement ::= WHILE LPAREN expression RPAREN statement;
-compundStatement ::= LCURL statementList RCURL;
-callStatement ::= IDENT LPAREN argList RPAREN SEMIC;
-// LT, LE, GT, GE, NE, EQ;
+declarationList ::= declaration:decl0 declarationList:list {:RESULT = List.cons(decl0,list);:}
+                | {:RESULT = List.nil();:};
+declaration ::=  VAR:var IDENT:ident COLON typeExpression:type SEMIC {:RESULT = new VariableDeclaration(new Position(varleft,varright),ident,type);:};
 
-expression ::= plusminus LT plusminus | plusminus LE plusminus | plusminus GT plusminus| plusminus GE plusminus| plusminus NE plusminus | plusminus EQ plusminus| plusminus;
+typeDeclaration ::= TYPE:ty IDENT:name EQ typeExpression:type SEMIC {:RESULT = new TypeDeclaration(new Position(tyleft,tyright),name,type);:};
+
+statementList ::= statement:stm0 statementList:stmList {:RESULT = List.cons(stm0,stmList);:}
+    | {:RESULT=List.nil();:};
 
 
-argList ::= plusminus | plusminus COMMA argList | ;
 
-parameterlist ::= parameter COMMA parameterlist | parameter | ;
-parameter ::= IDENT COLON typeExpression | REF IDENT COLON typeExpression;
+statement ::= assignStatement:assSta {:RESULT = assSta;:}
+| ifstatement:ifSta{:RESULT = ifSta;:}
+| whileStatement :whileSta{:RESULT = whileSta;:}
+| compundStatement :compSta{:RESULT = compSta;:}
+| callStatement :callSta{:RESULT = callSta;:}
+| emptyStatement:emptySta{:RESULT = emptySta;:};
 
-assignStatement ::= variableExpression ASGN plusminus SEMIC;
+emptyStatement ::= SEMIC:semic {:RESULT  = new EmptyStatement(new Position(semicleft,semicright));:};
+assignStatement ::= variable:var ASGN expression:exp0 SEMIC{:RESULT = new AssignStatement(new Position(varleft,varright),var,exp0);:};
+whileStatement ::= WHILE:wh LPAREN expression:exp RPAREN statement:statement{:RESULT = new WhileStatement(new Position(whleft,whright),exp,statement);:};
+compundStatement ::= LCURL:l statementList:stmList RCURL {:RESULT = new CompoundStatement(new Position(lleft,lright),stmList);:};
+callStatement ::= IDENT:name LPAREN argList:argList RPAREN SEMIC:semic{:RESULT = new CallStatement(new Position(nameleft,nameright),name,argList);:};
+ifstatement ::= IF:i LPAREN expression:exp RPAREN statement:thenStm {:RESULT = new IfStatement(new Position(ileft,iright),exp,thenStm,new EmptyStatement(Position.ERROR_POSITION));:}
+| IF:i  LPAREN expression:exp RPAREN statement:thenStm ELSE statement:elseStm{:RESULT = new IfStatement(new Position(ileft,iright),exp,thenStm,elseStm);:};
 
-plusminus ::= plusminus:exp0 PLUS divmulti:exp1 {: RESULT= new BinaryExpression(new Position(exp0left,exp1right),Operator.ADD,exp0,exp1);:}
-                | plusminus MINUS divmulti  {: RESULT= new BinaryExpression(new Position(exp0left,exp1right),Operator.SUB,exp0,exp1);:}
-                | divmulti:exp {:RESULT= exp;:};
-divmulti ::= divmulti STAR unaryMinus | divmulti SLASH unaryMinus | unaryMinus;
-unaryMinus ::= MINUS  primaryExpression | primaryExpression;
-primaryExpression ::= INTLIT | LPAREN plusminus RPAREN | variableExpression ;
-variableExpression ::= IDENT | variableExpression LBRACK plusminus RBRACK;
+argList ::= expression:val {:RESULT = List.of(val);:}
+| expression:val COMMA argList:list {:RESULT = List.cons(val,list);:}
+| {:RESULT = List.nil();:};
+
+
+
+expression ::= binaryExpression:exp0 {:RESULT = exp0;:} ;
+
+binaryExpression ::= plusminus:bex0 LT plusminus:bex1 {:RESULT = new BinaryExpression(new Position(bex0left,bex0right),BinaryExpression.Operator.LST,bex0,bex1);:}
+| plusminus:bex0 LE plusminus:bex1 {:RESULT = new BinaryExpression(new Position(bex0left,bex0right),BinaryExpression.Operator.LSE,bex0,bex1);:}
+| plusminus:bex0 GT plusminus:bex1 {:RESULT = new BinaryExpression(new Position(bex0left,bex0right),BinaryExpression.Operator.GRT,bex0,bex1);:}
+| plusminus:bex0 GE plusminus:bex1 {:RESULT = new BinaryExpression(new Position(bex0left,bex0right),BinaryExpression.Operator.GRE,bex0,bex1);:}
+| plusminus:bex0 NE plusminus:bex1 {:RESULT = new BinaryExpression(new Position(bex0left,bex0right),BinaryExpression.Operator.NEQ,bex0,bex1);:}
+| plusminus:bex0 EQ plusminus:bex1 {:RESULT = new BinaryExpression(new Position(bex0left,bex0right),BinaryExpression.Operator.EQU,bex0,bex1);:}
+| plusminus:bex {:RESULT = bex;:} ;
+
+
+
+plusminus ::= plusminus:exp0 PLUS divmulti:exp1 {: RESULT= new BinaryExpression(new Position(exp0left,exp0right),BinaryExpression.Operator.ADD,exp0,exp1);:}
+             | plusminus:exp0 MINUS divmulti:exp1 {: RESULT= new BinaryExpression(new Position(exp0left,exp0right),BinaryExpression.Operator.SUB,exp0,exp1);:}
+             | divmulti:exp {:RESULT= exp;:};
+
+divmulti ::= divmulti:exp0 STAR unaryMinus:exp1 {: RESULT= new BinaryExpression(new Position(exp0left,exp0right),BinaryExpression.Operator.MUL,exp0,exp1);:}
+| divmulti:exp0 SLASH unaryMinus:exp1 {: RESULT= new BinaryExpression(new Position(exp0left,exp0right),BinaryExpression.Operator.DIV,exp0,exp1);:}
+| unaryMinus:um {:RESULT = um;:};
+
+unaryMinus ::= MINUS:min  primaryExpression:exp
+{:RESULT = new BinaryExpression(new Position(minleft,minright),BinaryExpression.Operator.SUB,new IntLiteral(new Position(minleft,minright),0),exp);:}   //TODO
+| primaryExpression:exp0 {:RESULT = exp0;:};
+
+primaryExpression ::= INTLIT:lit {:RESULT = new IntLiteral(new Position(litleft,litright),lit);:}
+| LPAREN plusminus:plmi RPAREN {:RESULT = plmi;:}
+| variableExpression:exp0 {: RESULT = exp0;:};
+variableExpression ::= variable:var {:RESULT = new VariableExpression(new Position(varleft,varright),var);:};
+
+variable ::= namedVariable:nv {:RESULT = nv; :}
+| arrayAccess:aa {:RESULT =aa;:};
+
+namedVariable ::= IDENT:name {: RESULT = new NamedVariable(new Position(nameleft,nameright),name);:};
+
+arrayAccess ::= variable:var LBRACK expression:index RBRACK {:RESULT = new ArrayAccess(new Position(varleft,varright),var,index);:};
