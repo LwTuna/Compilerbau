@@ -71,7 +71,7 @@ class Main {
         boolean optionTables = false;
         boolean optionSemant = false;
         boolean optionVars = false;
-        String inFilename = "";
+        String inFilename = "spltest/acker.spl";
         String outFilename = "";
 
         for (String name : args) {

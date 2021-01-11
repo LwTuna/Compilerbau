@@ -1,4 +1,4 @@
-
+type A = array [10] of int;
 // a nasty procedure - how big is the framesize?
 proc manyargs(i : int, j : myInt, ref k:tensor, ref l : myInt) {
 	callRecursive(i,j);

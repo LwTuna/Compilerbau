@@ -2,6 +2,7 @@ package de.thm.mni.compilerbau.phases._04a_tablebuild;
 
 import de.thm.mni.compilerbau.absyn.*;
 import de.thm.mni.compilerbau.absyn.visitor.DoNothingVisitor;
+import de.thm.mni.compilerbau.absyn.visitor.Visitable;
 import de.thm.mni.compilerbau.table.*;
 import de.thm.mni.compilerbau.types.ArrayType;
 import de.thm.mni.compilerbau.types.Type;
@@ -19,7 +20,7 @@ import java.util.stream.Collectors;
  * Calculated {@link Type}s can be stored in and read from the dataType field of the {@link Expression},
  * {@link TypeExpression} or {@link Variable} classes.
  */
-public class TableBuilder {
+public class TableBuilder{
     private final boolean showTables;
 
     public TableBuilder(boolean showTables) {
@@ -28,8 +29,17 @@ public class TableBuilder {
 
     public SymbolTable buildSymbolTable(Program program) {
 
-        //TODO (assignment 4a): Initialize a symbol table with all predefined symbols and fill it with user-defined symbols
 
-        throw new NotImplemented();
+
+        SymbolTable symbolTable = TableInitializer.initializeGlobalTable();
+        NodeVisitor nodeVisitor = new NodeVisitor(symbolTable,showTables);
+
+        for(Visitable visitable: program.declarations){
+            visitable.accept(nodeVisitor);
+        }
+
+        return symbolTable;
     }
+
+
 }
