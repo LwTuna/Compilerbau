@@ -41,7 +41,7 @@ public class NodeVisitor extends DoNothingVisitor {
         symbolTable.enter(new ProcedureEntry(procedureDeclaration.name,localTable,parameterTypeList),SplError.RedeclarationAsProcedure(procedureDeclaration.position,procedureDeclaration.name));
 
         if(showTables){
-            System.out.printf("symbol table at end of procedure '%s':\n" +localTable.toString(),procedureDeclaration.name);
+            System.out.printf("symbol table at end of procedure '%s':\n" +localTable.toString()+"\n",procedureDeclaration.name);
         }
     }
 
