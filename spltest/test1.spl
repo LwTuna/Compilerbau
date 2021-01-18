@@ -3,9 +3,13 @@ type matrix = array [8] of array [8] of int;
 proc main(){
 
     var test : matrix;
-       var x:int;
+    var x:int;
     test[0][1] := 4;
     readi(x);
+}
+
+proc test(t1 : int, t2: int){
+
 }
 
 

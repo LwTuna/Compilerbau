@@ -26,12 +26,11 @@ public class VarAllocator {
     }
 
     public void allocVars(Program program, SymbolTable table) {
-        //TODO (assignment 5): Allocate stack slots for all parameters and local variables
 
-        throw new NotImplemented();
+        VarAllocatorVisitor varAllocatorVisitor = new VarAllocatorVisitor(table);
+        program.accept(varAllocatorVisitor);
 
-        //TODO: Uncomment this when the above exception is removed!
-        //if (showVarAlloc) System.out.println(formatVars(program, table));
+        if (showVarAlloc) System.out.println(formatVars(program, table));
     }
 
     /**
