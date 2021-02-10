@@ -1,0 +1,10 @@
+
+
+proc main(){
+
+    var x:int;
+    x:= 4;
+}
+
+
+

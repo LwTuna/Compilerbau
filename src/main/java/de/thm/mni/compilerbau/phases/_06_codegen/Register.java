@@ -23,9 +23,11 @@ class Register {
      * @return The register preceding the current one by the given offset.
      */
     Register previous(int offset) {
-        return new Register(number - offset);
+        return next(-offset);
     }
-
+    Register next(int offset) {
+        return new Register(number + offset);
+    }
     @Override
     public String toString() {
         return "$" + number;

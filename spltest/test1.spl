@@ -1,15 +1,10 @@
-type matrix = array [8] of array [8] of int;
+type vector = array [5] of int;
 
 proc main(){
 
-    var test : matrix;
-    var x:int;
-    test[0][1] := 4;
-    readi(x);
+	var vec : vector;
+	vec[1] := 3;
 }
 
-proc test(t1 : int, t2: int){
-
-}
 
 

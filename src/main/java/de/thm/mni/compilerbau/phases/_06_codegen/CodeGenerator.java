@@ -46,8 +46,13 @@ public class CodeGenerator {
     public void generateCode(Program program, SymbolTable table) {
         assemblerProlog();
 
-        //TODO (assignment 6): generate eco32 assembler code for the spl program
+        for(GlobalDeclaration globalDeclaration:program.declarations){
+            if(globalDeclaration instanceof ProcedureDeclaration){
 
-        throw new NotImplemented();
+                ProcedureDeclaration procedureDeclaration = (ProcedureDeclaration) globalDeclaration;
+                CodeVisitor codeVisitor = new CodeVisitor(output,((ProcedureEntry) table.lookup(procedureDeclaration.name)).localTable,program);
+                procedureDeclaration.accept(codeVisitor);
+            }
+        }
     }
 }
