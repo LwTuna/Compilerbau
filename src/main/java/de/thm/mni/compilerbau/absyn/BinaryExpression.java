@@ -51,7 +51,23 @@ public class BinaryExpression extends Expression {
          * @return The "opposite" comparison operator
          */
         public Operator flipComparison() {
-            throw new NotImplemented();
+            switch (this){
+                case EQU:
+                    return NEQ;
+                case NEQ:
+                    return EQU;
+                case LST:
+                    return GRE;
+                case LSE:
+                    return GRT;
+                case GRT:
+                    return LSE;
+                case GRE:
+                    return LST;
+                default:
+                    return this;
+            }
+
         }
     }
 

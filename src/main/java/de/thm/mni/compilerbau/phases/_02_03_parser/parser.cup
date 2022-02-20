@@ -90,7 +90,6 @@ statementList ::= statement:stm0 statementList:stmList {:RESULT = List.cons(stm0
     | {:RESULT=List.nil();:};
 
 
-
 statement ::= assignStatement:assSta {:RESULT = assSta;:}
 | ifstatement:ifSta{:RESULT = ifSta;:}
 | whileStatement :whileSta{:RESULT = whileSta;:}

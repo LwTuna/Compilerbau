@@ -45,14 +45,7 @@ public class CodeGenerator {
 
     public void generateCode(Program program, SymbolTable table) {
         assemblerProlog();
+        program.accept(new CodeVisitor(output,table,0));
 
-        for(GlobalDeclaration globalDeclaration:program.declarations){
-            if(globalDeclaration instanceof ProcedureDeclaration){
-
-                ProcedureDeclaration procedureDeclaration = (ProcedureDeclaration) globalDeclaration;
-                CodeVisitor codeVisitor = new CodeVisitor(output,((ProcedureEntry) table.lookup(procedureDeclaration.name)).localTable,program);
-                procedureDeclaration.accept(codeVisitor);
-            }
-        }
     }
 }

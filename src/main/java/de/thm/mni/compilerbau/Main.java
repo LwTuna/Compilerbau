@@ -71,8 +71,8 @@ class Main {
         boolean optionTables = false;
         boolean optionSemant = false;
         boolean optionVars = false;
-        String inFilename = "spltest/test1.spl";
-        String outFilename = "spltest/test1";
+        String inFilename = "";
+        String outFilename = "";
 
         for (String name : args) {
             switch (name) {

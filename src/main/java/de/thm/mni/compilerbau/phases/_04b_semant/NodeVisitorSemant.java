@@ -73,12 +73,17 @@ public class NodeVisitorSemant extends DoNothingVisitor {
 
     public void visit(IfStatement ifStatement){
         ifStatement.condition.accept(this);
+
         procedureBodyChecker.checkType(PrimitiveType.boolType, ifStatement.condition.dataType,SplError.IfConditionMustBeBoolean(ifStatement.position));
+        ifStatement.thenPart.accept(this);
+        ifStatement.elsePart.accept(this);
     }
 
     public void visit(WhileStatement whileStatement){
         whileStatement.condition.accept(this);
+
         procedureBodyChecker.checkType(PrimitiveType.boolType, whileStatement.condition.dataType,SplError.WhileConditionMustBeBoolean(whileStatement.position));
+        whileStatement.body.accept(this);
     }
 
     @Override
@@ -122,7 +127,11 @@ public class NodeVisitorSemant extends DoNothingVisitor {
         variableExpression.dataType = variableExpression.variable.dataType;
     }
 
-
+    public void visit(CompoundStatement compoundStatement){
+        for(Statement statement:compoundStatement.statements){
+            statement.accept(this);
+        }
+    }
 
     public void visit(BinaryExpression binaryExpression){
         binaryExpression.leftOperand.accept(this);
